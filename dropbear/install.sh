@@ -11,3 +11,6 @@ mv /usr/lib/dropbear/dropbearconvert /usr/local/bin
 
 # We don't need an SSH client
 rm /usr/bin/dbclient
+
+# Symlink important keys directory to mark it for backup
+ln -s /data/ssh-keys /important/

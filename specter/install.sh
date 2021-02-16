@@ -26,6 +26,9 @@ s6-setuidgid specter pip3 install --user .
 python3.7 -m cryptoadvance.specter server --host ! > /dev/null 2>&1 || true
 [ -f ~/.specter/config.json ] || exit 1
 
+# Symlink important wallets/devices config directory to mark it for backup
+ln -s /data/specter /important/
+
 # Cleanup
 apt-get purge -y python3.7-dev python3-pip python3-setuptools build-essential libudev-dev libusb-1.0-0-dev python3-wheel
 rm -r ~/specter-desktop-* ~/.cache

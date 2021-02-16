@@ -13,7 +13,7 @@ export NOTIFY_FD=5
 export RUST_LOG_STYLE=always
 
 # Enable real-time updates using unix socket notifications when bitcoind is running locally.
-# See init.sh and https://github.com/bwt-dev/bwt#real-time-indexing
+# Also see init.sh and https://github.com/bwt-dev/bwt#real-time-indexing
 if [ "$BITCOIND_MODE" == "local" ]; then
   mkdir -p /run/bwt && chown bwt /run/bwt
   export UNIX_LISTENER_PATH=/run/bwt/notify-socket
@@ -34,8 +34,10 @@ fi
 
 # Suppress bwt's default startup banner and display it on our own,
 # with a slight delay and some modifications
-export NO_STARTUP_BANNER=1
-mkdir /tmp/banner.once 2> /dev/null && (wait_for_service bwt 0 && sleep 1 && banner s &)
+if [ -z "$NO_STARTUP_BANNER" ]; then
+  export NO_STARTUP_BANNER=1
+  mkdir /tmp/banner.once 2> /dev/null && (wait_for_service bwt 0 && sleep 1 && banner -s &)
+fi
 
 # Start
 info bwt Starting Bitcoin Wallet Tracker...

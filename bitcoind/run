@@ -59,6 +59,9 @@ BITCOIND_OPTS="$BITCOIND_OPTS -datadir=$BITCOIND_DIR -chain=$BITCOIND_CHAIN
 # Sync from trusted snapshot (prunednode.today)
 bool_opt "$TRUSTED_FASTSYNC" && source fastsync/fastsync.sh
 
+# Create 'wallets' subdirectory so bitcoind uses it as the -walletdir and groups wallets under it
+mkdir -p $BITCOIND_NETDIR/wallets
+
 # Spawn background subshell to signal readiness and run some post-initialization code
 (
   # Wait for the RPC to warm up and test connectivity

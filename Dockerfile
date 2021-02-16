@@ -27,7 +27,7 @@ ARG S6_OVERLAY_SHA256=2dcb59b63d1d0f5f056d4e10d6cbae21a9c216e130080d3b5aaa8e7325
 
 ARG NODEJS_VERSION=14.15.5
 ARG NODEJS_ARCH=linux-x64
-ARG NODEJS_SHA256=fa198afa9a2872cde991c3aa71796894bf7b5310d6eb178c3eafcf66e3ae79a7
+ARG NODEJS_SHA256=e30c1fd4807fba052c209d7577bb6b63b5096d67c1b9ac753b9d502fda43ded9
 
 COPY . /tmp/setup
 RUN (cd /tmp/setup && ./install.sh) && rm -r /tmp/*
@@ -42,5 +42,4 @@ ENV SSHD=0
 ENV BWT_LOGS=1
 
 ENV PATH=/ez/bin:$PATH
-# FIXME VOLUME /data
 ENTRYPOINT ["/ez/entrypoint.sh"]

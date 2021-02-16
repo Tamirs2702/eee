@@ -18,7 +18,7 @@ if [ -z "$BIND_ADDR" ]; then
               "Services will be bound on 127.0.0.1 by default, to prevent them from accidentally being left exposed to the world." \
               "Set BIND_ADDR=0.0.0.0 if you'd like to accept remote connections."
     # This could be a false positive, if the user reconfigured docker's IP range.
-    # I couldn't find a more reliable way to do this.
+    # I couldn't find a reliable way to do this.
   fi
 fi
 

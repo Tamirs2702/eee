@@ -3,20 +3,22 @@
 bool_opt() { [ -n "$1" ] && [ "$1" != "0" ] && [ "$1" != "false" ] && [ "$1" != "off" ]; }
 
 wait_for_file() { # (path, timeout=15s)
-  debug wait_for_file $(basename $PWD) waiting for $1
-  [ -f "$1" ] || timeout ${2:-15s} sed -n "/^$(basename "$1")\$/ q" \
-    <(inotifywait -e create,moved_to --format '%f' -qmr "$(dirname "$1")") \
-    || { warn wait_for_file $1 did not appear after ${2:-15s} && return 1; }
-    # XXX cleanup inotify
+  timeout=${2:-15s}
+  debug $(basename $PWD) waiting for $1 for up to $timeout
+  pfile=$(mktemp -u)
+  [ -f "$1" ] \
+  || (pidfile $pfile timeout $timeout inotifywait -e create,moved_to --format '%f' -m "$(dirname "$1")" 2>&1 \
+    | { grep -qx 'Watches established.' && [ -f "$1" ] || grep -qFx "$(basename "$1")" && killpidf $pfile; }) \
+  || { warn $(basename $PWD) $1 did not appear && return 1; }
 }
 
 wait_for_service() { # (service, timeout=3 minutes)
   timeout=${2:-180000}
-  debug wait_for_service $(basename $PWD) waiting for $1 for up to ${timeout}ms
+  debug $(basename $PWD) waiting for $1 for up to ${timeout}ms
   # wait for the fd readiness notification when the fd file exists (https://skarnet.org/software/s6/notifywhenup.html)
   wait_type=$([ -f /run/s6/services/$1/notification-fd ] && echo '-U' || echo '-u')
   s6-svwait -t $timeout $wait_type /run/s6/services/$1 2> /dev/null \
-    || { debug wait_for_service failed waiting for $1 && return 1; }
+    || { debug $(basename $PWD) failed waiting for $1 && return 1; }
 }
 
 wait_for_bitcoind() {
@@ -34,12 +36,23 @@ abort_service() {
   touch down && s6-svc -O . && exit 0
 }
 
-kill_descendants() { #(pid, command name, signal)
+# XXX get rid
+kill_descendants() { #(pid, command name, signal)wAITING_F
   local pids=$1; local cmd=$2; local sig=${3:-INT}
   while [ -n "$pids" ]; do
     xargs -n1 pkill -$sig -x $cmd -P <<< $pids || true
     pids=$(xargs -n1 pgrep -P <<< $pids)
   done
+}
+
+pidfile() { #(pidfile, command...)
+  "${@:2}" &
+  echo $! > $1
+  wait
+}
+killpidf() { #(pidfile)
+  kill $(cat "$1") 2> /dev/null || true
+  rm "$1"
 }
 
 BOLD=$(echo -en '\e[1m')

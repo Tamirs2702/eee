@@ -1,5 +1,7 @@
 #!/bin/bash
 set -xeo pipefail
+export DOCKER_CLI_EXPERIMENTAL=enabled
+
 docker_name=shesek/bundle # FIXME
 version=${1:?"Usage: $0 <version>"}
 
@@ -10,16 +12,16 @@ build_variant() {
   local tag_alias=$docker_name:$2
   local packages=$3
 
-  for arch in amd64 arm ; do # FIXME arm64
+  for arch in amd64 arm arm64; do
     INSTALL=$packages ./docker/build-arch.sh $arch -t $tag-$arch
-    docker push $tag-$arch
-    sha256=$(docker inspect --format='{{index .RepoDigests 0}}' $tag-$arch | cut -d: -f2)
-    echo "$sha256  docker:$tag-$arch" | tee -a SHA256SUMS
+    # FIXME docker push $tag-$arch
+    #sha256=$(docker inspect --format='{{index .RepoDigests 0}}' $tag-$arch | cut -d: -f2)
+    #echo "$sha256  $tag-$arch" | tee -a SHA256SUMS
   done
 
   # Can't alias multi-arch manifest images, have to create it twice.
   for name in $tag $tag_alias; do
-    docker manifest create --amend $name $tag-amd64 $tag-arm # FIXME $tag-arm64
+    docker manifest create --amend $name $tag-amd64 $tag-arm $tag-arm64
     for arch in amd64 arm ; do # FIXME arm64
       docker manifest annotate $name $tag-$arch --os linux --arch $arch
     done
@@ -36,8 +38,8 @@ echo -e "Releasing eznode v$version\n\n$changelog\n\n"
 # Build & publish image variants for the various arches
 if [ -z "$SKIP_BUILD" ]; then
   echo -n > SHA256SUMS
-  build_variant $version latest nginx
-  #build_variant $version latest bitcoind,bwt,btc-rpc-explorer,specter,tor,nginx,letsencrypt
+  #build_variant $version latest bitcoind,btc-rpc-explorer
+  build_variant $version latest bitcoind,bwt,btc-rpc-explorer,specter,tor,nginx,letsencrypt
   #build_variant $version-local local bitcoind,bwt,specter,btc-rpc-explorer
   #build_variant $version-minimal minimal bitcoind,bwt
 

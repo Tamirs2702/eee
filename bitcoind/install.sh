@@ -17,5 +17,12 @@ mv bitcoin-cli /ez/bin/
 # Show warning message on shutdown
 mv shutdown-message.sh /etc/cont-finish.d/bitcoind-shutdown-message.sh
 
+# Symlink important directories to mark them for backup
+mkdir /important/bitcoind-wallets
+ln -s /data/bitcoin/wallets /important/bitcoind-wallets/mainnet
+for n in signet testnet3 regtest; do
+  ln -s /data/bitcoin/$n/wallets /important/bitcoind-wallets/$n
+done
+
 # Required for the fastsync script
 apt-get install -qqy --no-install-recommends unzip pv

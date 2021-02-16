@@ -1,5 +1,6 @@
 Dockerfile
 README.md
 docs
-docker
-!docker/networking.sh
+docker/*.env
+docker/build-arch.sh
+docker/release.sh

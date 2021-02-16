@@ -4,8 +4,9 @@ set -xeo pipefail
 apt-get update -qq
 apt-get install -qqy --no-install-recommends wget procps ca-certificates
 
-mkdir /ez /ez/bin /data
+mkdir /ez /ez/bin /important /data
 mv entrypoint.sh util.sh docker/networking.sh s6/default-finish.sh /ez/
+mv docker/backup.sh /ez/bin/backup
 
 install() {
   local name=$1

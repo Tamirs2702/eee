@@ -31,7 +31,8 @@ fi
 
 # Spawn background subshell to display service information after the Tor daemon is started
 (
-  wait_for_file /data/tor-hsv/hostname
+  # FIXME
+  wait_for_file /data/tor-hsv/hostname 1m || { warn tor file failed "$(ls -lah /data/tor-hsv)"; exit 1; }
   onion=$(cat /data/tor-hsv/hostname)
   bool_opt "$BWT" && info tor Electrum server: $onion:$(bool_opt "$SSL" && echo 50002:s || echo 50001:t) \
                   && info tor HTTP API server: http://$onion:3060/

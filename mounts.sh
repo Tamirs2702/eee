@@ -1,14 +1,15 @@
 #!/bin/bash
 
-#for s in bitcoind bwt nginx letsencrypt tor btc-rpc-explorer dropbear specter; do
-#  echo -n "-v $PWD/$s:/etc/services.d/$s:ro "
-#done
+for s in bitcoind bwt nginx letsencrypt tor btc-rpc-explorer dropbear specter; do
+  echo -n "-v $PWD/$s:/etc/services.d/$s:ro "
+done
 echo -n "-v $PWD/util.sh:/ez/util.sh:ro "
 echo -n "-v $PWD/entrypoint.sh:/ez/entrypoint.sh:ro "
 #echo -n "-v $HOME/workspace/bwt-dev/bwt/target/release/bwt:/usr/local/bin/bwt:ro "
 
 echo -n "-v $PWD/s6/service.sh:/ez/bin/service:ro "
 echo -n "-v $PWD/docker/networking.sh:/ez/networking.sh:ro "
+echo -n "-v $PWD/docker/backup.sh:/ez/bin/backup:ro "
 echo -n "-v $PWD/bitcoind/bitcoin-cli:/ez/bin/bitcoin-cli:ro "
 echo -n "-v $PWD/bitcoind/shutdown-message.sh:/etc/cont-finish.d/bitcoind-shutdown-message.sh:ro "
 echo -n "-v $PWD/bwt/banner.sh:/ez/bin/banner:ro "

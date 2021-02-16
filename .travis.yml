@@ -10,12 +10,6 @@ script: |
     docker logs ez &
     alias ez='docker exec ez'
 
-    # TEST without
-    sleep 2
-    # Wait for all services to be up
-    ez status
-    ez banner
-
     curl ez:3060/stream &
 
     addr=$(curl -L ez:3060/wallet/ju9npsex/next | jq -r .address)
@@ -24,4 +18,4 @@ script: |
     sleep 3
     curl -v ez:3060/address/$addr/stats
     [ $(curl ez:3060/address/$addr/stats | tee /dev/stdout | jq -r .unconfirmed_balance) -eq 123400000 ]
-  SHELL
+SHELL

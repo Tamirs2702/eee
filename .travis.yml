@@ -1,0 +1,9 @@
+before_script:
+  - docker build -t eznode .
+
+script: >
+  docker run -d --name ez -v /etc/hosts:/ez/hosts eznode NETWORK=regtest &&
+  sleep 2 &&
+  ez="docker exec -it ez" &&
+  $ez s6-svwait -t 100000 -U /run/s6/services/bwt &&
+  $ez banner

@@ -1,7 +1,7 @@
 before_script:
   - docker build -t eznode .
 
-script: |-2
+script: |-
   bash -xeo << 'SHELL'
     shopt -s expand_aliases
     xpub=tpubD6NzVbkrYhZ4X9SErApTtvF833DCUydyjhVyWiciPXmqC6pzngB6EyhUnnqJvhXgJmHj3bkWdcSjkD4FsysLWsAZ1nJNdjV7CJfHBFu66C8

@@ -13,7 +13,7 @@ script: |-
     # TEST without
     sleep 2
     # Wait for all services to be up
-    ez sh -c 'source /ez/util.sh; for s in bitcoind bwt btc-rpc-explorer specter tor dropbear nginx; do wait_for_service $s done'
+    ez sh -c 'source /ez/util.sh; for s in bitcoind bwt btc-rpc-explorer specter tor dropbear nginx; do wait_for_service $s; done'
     ez status
     ez banner
 

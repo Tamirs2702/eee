@@ -14,15 +14,14 @@ script: |-
     sleep 2
     # Wait for all services to come up
     ez bash -c 'source /ez/util.sh; for s in bitcoind bwt btc-rpc-explorer specter tor dropbear nginx; do wait_for_service $s; done'
-    ez status
     ez banner
-
-    curl ez:3060/stream &
+    ez status
+    curl ez:3060/stream | sed 's/^/[bwt stream] /' &
 
     addr=$(curl -L ez:3060/wallet/ju9npsex/next | jq -r .address)
     ez bitcoin-cli -rpcwallet=miner sendtoaddress $addr 1.234
 
     sleep 3
     curl -v ez:3060/address/$addr/stats
-    [ $(curl ez:3060/address/$addr/stats | tee /dev/stdout | jq -r .unconfirmed_balance) -eq 123400000 ]
+    [ $(curl ez:3060/address/$addr/stats | jq -r .unconfirmed_balance) -eq 123400000 ]
   SHELL

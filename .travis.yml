@@ -1,9 +1,27 @@
 before_script:
   - docker build -t eznode .
 
-script: >
-  docker run -d --name ez -v /etc/hosts:/ez/hosts eznode NETWORK=regtest &&
-  sleep 2 &&
-  ez="docker exec -it ez" &&
-  $ez s6-svwait -t 100000 -U /run/s6/services/bwt &&
-  $ez banner
+script: |
+  bash -xeo << 'SHELL'
+    shopt -s expand_aliases
+    xpub=tpubD6NzVbkrYhZ4X9SErApTtvF833DCUydyjhVyWiciPXmqC6pzngB6EyhUnnqJvhXgJmHj3bkWdcSjkD4FsysLWsAZ1nJNdjV7CJfHBFu66C8
+
+    docker run -d --name ez -v /etc/hosts:/ez/hosts eznode NETWORK=regtest XPUB=$xpub TOR=1 SSHD=1 SSL=1 SPECTER=1
+    docker logs ez &
+    alias ez='docker exec ez'
+
+    # TEST without
+    sleep 2
+    # Wait for all services to be up
+    ez status
+    ez banner
+
+    curl ez:3060/stream &
+
+    addr=$(curl -L ez:3060/wallet/ju9npsex/next | jq -r .address)
+    ez bitcoin-cli -rpcwallet=miner sendtoaddress $addr 1.234
+
+    sleep 3
+    curl -v ez:3060/address/$addr/stats
+    [ $(curl ez:3060/address/$addr/stats | tee /dev/stdout | jq -r .unconfirmed_balance) -eq 123400000 ]
+  SHELL
